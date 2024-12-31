@@ -1,0 +1,5 @@
+User_Data_Input_Invalid = "user's given data is wrong."
+Username_unavailable = "username already exists."
+Signup_success = "signed up successfully."
+Login_success = "logged in successfully."
+Update_password = "password updated."
