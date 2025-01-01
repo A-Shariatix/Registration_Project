@@ -5,9 +5,21 @@ def check_user_credentials(username, password, cursor):
 """this function checks if user's information including
 username and password exists in database.
 
-:param user_exist: 
+:param username: stores json data's key in a list
+:type username: list
+
+:param password: stores json data's value in a hashed format
+:type password: bytes
+
+:param cursor: stores the connected cursor to database
+:type cursor: 
+
+:param user_exist: stores the number of infected rows
 :type user_exist: int
 
+:return: True if both expected username and password
+exist in database. otherwise False.
+:rtype: bool
 """
     user_exist = cursor.execute(f'select username, password '
                                 f'from information where username = "{username}"'
@@ -18,10 +30,11 @@ username and password exists in database.
         return False
 
 
-"""this function checks validation of user's input"""
-
-
 def check_input_data(info, username):
+"""this function checks validation of user's input.
+
+:param info: 
+"""
     if len(username) > 0 and len(info[username]) > 0:
         return True
     return False
