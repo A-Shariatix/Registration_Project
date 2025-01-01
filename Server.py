@@ -7,11 +7,23 @@ from util import check_user_credentials, generate_hash, check_input_data
 app = Flask(__name__)
 
 
-""" sign_up code: first gets data in json format from user,
- including username and password; then checks if both username 
- and password do exist. after that, it hashes the password and
- checks if the hashed password and the username exist in database.
- if it doesn't exist, the query will be executed."""
+"""this is a decorator function which firstly checks if user's
+input structure is valid. then checks if user's data exists in
+database or not. then tries to insert entered data into database.
+
+:param data: stores the data sent by user
+:type data: json
+
+:param username: stores json data's key in a list
+:type username: list
+
+:param password: stores json data's value in a hashed format
+:type password: bytes
+
+:return: returns 400 status code and a message if data is invalid
+otherwise a 204 status code and a different message will be returned
+:rtype: string, http status code
+"""
 
 
 @app.route('/sign_up', methods=['POST'])
@@ -29,11 +41,17 @@ def sign_up():
     return lang.User_Data_Input_Invalid, 400
 
 
-""" login code: first gets data in json format from user,
- including username and password; then checks if both username 
- and password do exist. after that, it hashes the password and
- checks if the hashed password and the username exist in database.
- if it exists, the query will be executed."""
+"""this is a decorator function which firstly checks if user's
+input structure is valid. then checks if user's data exists in
+database or not.
+
+:param data: stores the data sent by user
+:type data: json
+
+:return: returns 400 status code and a message if data already exists
+in database. otherwise a 204 status code and a different message will
+be returned.
+:rtype: string, http status code"""
 
 
 @app.route('/login', methods=['POST'])
