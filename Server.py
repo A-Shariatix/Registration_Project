@@ -16,8 +16,8 @@ database or not. then tries to insert entered data into database.
 :param data: stores the data sent by user
 :type data: json
 
-:param username: stores json data's key in a list
-:type username: list
+:param username: stores json data's key by using list
+:type username: string
 
 :param password: stores json data's value in a hashed format
 :type password: bytes
@@ -48,8 +48,8 @@ database or not.
 :param data: stores the data sent by user
 :type data: json
 
-:param username: stores json data's key in a list
-:type username: list
+:param username: stores json data's key by using list
+:type username: string
 
 :param password: stores json data's value in a hashed format
 :type password: bytes
@@ -78,8 +78,8 @@ database or not. then tries to update password in database.
 :param data: stores the data sent by user
 :type data: json
 
-:param username: stores json data's key in a list
-:type username: list
+:param username: stores json data's key by using list
+:type username: string
 
 :param password: stores json data's value in a hashed format
 :type password: bytes
