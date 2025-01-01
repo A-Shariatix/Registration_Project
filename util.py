@@ -12,7 +12,7 @@ username and password exists in database.
 :type password: bytes
 
 :param cursor: stores the connected cursor to database
-:type cursor: 
+:type cursor: Cursor
 
 :param user_exist: stores the number of infected rows
 :type user_exist: int
@@ -30,21 +30,43 @@ exist in database. otherwise False.
         return False
 
 
-def check_input_data(info, username):
+def check_input_data(data, username):
 """this function checks validation of user's input.
 
-:param info: 
+:param data: stores user's sent data in json format
+:type data: json
+
+:param username: stores data's key
+:type username: string
+
+:return: True if username and password are entered;
+otherwise False.
+:rtype: bool
 """
-    if len(username) > 0 and len(info[username]) > 0:
+    if len(username) > 0 and len(data[username]) > 0:
         return True
     return False
 
 
-"""this function hashes the given key of the given dictionary
-and returns it as hashed password"""
+def generate_hash(data, username):
+"""this function hashes the given stringand returns
+it as hashed password.
 
+:param data: stores user's sent data in json format
+:type data: json
 
-def generate_hash(data, user):
+:param username: stores info's key
+:type username: string
+
+:param salt: stores a pre ordered salt
+:type salt: bytes
+
+:param password: stores json data's value in a hashed format
+:type password: bytes
+
+:return: returns hashed password
+:rtype: bytes
+"""
     salt = b'$2b$12$NmjU6/raMmtCvJMHgx6ht.'
-    password = bcrypt.hashpw(data[user].encode("utf-8"), salt)
+    password = bcrypt.hashpw(data[username].encode("utf-8"), salt)
     return password
