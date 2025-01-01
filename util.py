@@ -1,11 +1,14 @@
 import bcrypt
 
 
-"""this function checks if user's information including
-username and password exists in database"""
-
-
 def check_user_credentials(username, password, cursor):
+"""this function checks if user's information including
+username and password exists in database.
+
+:param user_exist: 
+:type user_exist: int
+
+"""
     user_exist = cursor.execute(f'select username, password '
                                 f'from information where username = "{username}"'
                                 f' and password = "{password}"')
