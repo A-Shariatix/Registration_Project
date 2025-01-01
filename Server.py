@@ -7,6 +7,8 @@ from util import check_user_credentials, generate_hash, check_input_data
 app = Flask(__name__)
 
 
+@app.route('/sign_up', methods=['POST'])
+def sign_up():
 """this is a decorator function which firstly checks if user's
 input structure is valid. then checks if user's data exists in
 database or not. then tries to insert entered data into database.
@@ -24,10 +26,6 @@ database or not. then tries to insert entered data into database.
 otherwise a 204 status code and a different message will be returned
 :rtype: string, http status code
 """
-
-
-@app.route('/sign_up', methods=['POST'])
-def sign_up():
     data = request.get_json()
     username = list(data)[0]
     if check_input_data(data, username) is True:
@@ -41,6 +39,8 @@ def sign_up():
     return lang.User_Data_Input_Invalid, 400
 
 
+@app.route('/login', methods=['POST'])
+def login():
 """this is a decorator function which firstly checks if user's
 input structure is valid. then checks if user's data exists in
 database or not.
@@ -57,11 +57,7 @@ database or not.
 :return: returns 400 status code and a message if data already exists
 in database. otherwise a 204 status code and a different message will
 be returned.
-:rtype: string, http status code"""
-
-
-@app.route('/login', methods=['POST'])
-def login():
+:rtype: string, http status code"""   
     data = request.get_json()
     username = list(data)[0]
     password = generate_hash(data, username)
@@ -73,6 +69,8 @@ def login():
     return lang.User_Data_Input_Invalid, 400
 
 
+@app.route('/forgotten_password', methods=['POST'])
+def forgotten_password():
 """this is a decorator function which firstly checks if user's
 input structure is valid. then checks if user's data exists in
 database or not. then tries to update password in database.
@@ -90,10 +88,6 @@ database or not. then tries to update password in database.
 otherwise a 204 status code and a different message will be returned
 :rtype: string, http status code
 """
-
-
-@app.route('/forgotten_password', methods=['POST'])
-def forgotten_password():
     data = request.get_json()
     username = list(data)[0]
     if check_input_data(data, username) is True:
