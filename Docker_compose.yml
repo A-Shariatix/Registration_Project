@@ -1,0 +1,14 @@
+name: "basic_registration"
+services:
+    mysql:
+        container_name: new_sql
+        image: mysql:8.1.0
+        ports:
+            - "3306:3306"
+        environment:
+            - MYSQL_ROOT_PASSWORD: root
+    server:
+        container_name: new_server
+        build: ./
+        depends_on:
+            - mysql
