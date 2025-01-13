@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.11.6
 WORKDIR /app
 ADD Server.py .
 ADD util.py .
