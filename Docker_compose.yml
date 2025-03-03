@@ -10,5 +10,4 @@ services:
     server:
         container_name: new_server
         build: ./
-        depends_on:
-            - mysql
+        
