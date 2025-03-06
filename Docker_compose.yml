@@ -1,13 +1,22 @@
 name: "basic_registration"
 services:
-    mysql:
-        container_name: new_sql
+    database_server:
+        container_name: mysql_db
         image: mysql:8.1.0
         ports:
             - "3306:3306"
         environment:
             - MYSQL_ROOT_PASSWORD: root
-    server:
-        container_name: new_server
+            
+    registration_server_1:
+        container_name: server_1
         build: ./
         
+    registration_server_2:
+        container_name: server_2
+        build: ./
+    
+    load_balancer:
+        image: haproxy:3.2
+        volume: ./haproxy.cfg
+            
