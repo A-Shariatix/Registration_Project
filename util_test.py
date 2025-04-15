@@ -15,10 +15,10 @@ class TestRegistration(unittest.TestCase):
         self.assertEqual(util.check_input_data(self.data, self.user), True)
 
     def test_invalid_input_username_missing(self):
-        self.assertEqual(util.check_input_data({'': 'meow'}, ''), False)
+        self.assertEqual(util.check_input_data({'': 'pass'}, ''), False)
 
     def test_invalid_input_password_missing(self):
-        self.assertEqual(util.check_input_data({'cat': ''}, 'cat'), False)
+        self.assertEqual(util.check_input_data({'user': ''}, 'user'), False)
 
 
 if __name__ == '__main__':
