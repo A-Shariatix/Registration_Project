@@ -1,22 +1,95 @@
-name: "basic_registration"
+name: basic-registration
 services:
-    database_server:
-        container_name: mysql_db
+    database:
+        container_name: mysql
         image: mysql:8.1.0
         ports:
             - "3306:3306"
         environment:
-            - MYSQL_ROOT_PASSWORD: root
-            
-    registration_server_1:
-        container_name: server_1
-        build: ./
-        
-    registration_server_2:
-        container_name: server_2
-        build: ./
-    
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: users
+            MYSQL_USER: batman
+            MYSQL_PASSWORD: root
+        networks:
+            - basic_registration
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ubatman", "-proot"]
+            interval: 10s
+            retries: 20
+        volumes:
+            - database-data:/var/lib/mysql
+    database_migrator:
+        container_name: db_migrator
+        build:
+            context: db_migrator
+        networks:
+            - basic_registration
+        depends_on:
+            database:
+                condition: service_healthy
+#    time_series_database:
+#        container_name: prometheus
+#        image: prom/prometheus:v3.2.1
+#        volumes:
+#            - "./monitoring/prometheus.yaml:/etc/prometheus/prometheus.yaml"
+#        ports:
+#            - "9090:9090"
+#        networks:
+#            - basic_registration
+#    exporter:
+#        container_name: node_exporter
+#        image: prom/node-exporter
+#        ports:
+#            - "9100:9100"
+#        networks:
+#            - basic_registration
+#    visualizer:
+#        container_name: grafana
+#        image: grafana/grafana:11.6.0
+#        ports:
+#            - "3000:3000"
+#        networks:
+#            - basic_registration
     load_balancer:
-        image: haproxy:3.2
-        volume: ./haproxy.cfg
-            
+        container_name: haproxy
+        image: haproxy:3.1.1
+        volumes:
+            - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+        ports:
+            - "8080:8080"
+        depends_on:
+            - backend_1
+            - backend_2
+            - backend_3
+        networks:
+            - basic_registration
+    backend_1:
+        container_name: registration_backend_1
+        build: ./
+        networks:
+            - basic_registration
+        depends_on:
+            database_migrator:
+                condition: service_completed_successfully
+    backend_2:
+        container_name: registration_backend_2
+        build: ./
+        networks:
+            - basic_registration
+        depends_on:
+            database_migrator:
+                condition: service_completed_successfully
+    backend_3:
+        container_name: registration_backend_3
+        build: ./
+        networks:
+            - basic_registration
+        depends_on:
+            database_migrator:
+                condition: service_completed_successfully
+networks:
+    basic_registration:
+        driver: bridge
+volumes:
+    database-data:
+    visualizer-data:
