@@ -27,15 +27,15 @@ services:
         depends_on:
             database:
                 condition: service_healthy
-#    time_series_database:
-#        container_name: prometheus
-#        image: prom/prometheus:v3.2.1
-#        volumes:
-#            - "./monitoring/prometheus.yaml:/etc/prometheus/prometheus.yaml"
-#        ports:
-#            - "9090:9090"
-#        networks:
-#            - basic_registration
+   time_series_database:
+       container_name: prometheus
+       image: prom/prometheus:v3.2.1
+       volumes:
+           - "./monitoring/prometheus.yaml:/etc/prometheus/prometheus.yaml"
+       ports:
+           - "9090:9090"
+       networks:
+           - basic_registration
 #    exporter:
 #        container_name: node_exporter
 #        image: prom/node-exporter
