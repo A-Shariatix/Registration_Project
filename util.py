@@ -22,9 +22,9 @@ def check_user_credentials(username, password, cursor):
                                 from information where username = %s
                                 and password = %s''', (username, password))
 
-    fetcher = cursor.fetchone()
-    print(fetcher)
-    print(f'matching users found : {user_exist}')
+    # fetcher = cursor.fetchone()
+    # print(fetcher)
+    # print(f'matching users found : {user_exist}')
     if user_exist == 1:
         return True
     elif user_exist == 0:
