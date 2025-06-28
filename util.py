@@ -22,9 +22,9 @@ def check_user_credentials(username, password, cursor):
                                 from information where username = %s
                                 and password = %s''', (username, password))
 
-    fetcher = cursor.fetchone()
-    print(fetcher)
-    print(f'matching users found : {user_exist}')
+    # fetcher = cursor.fetchone()
+    # print(fetcher)
+    # print(f' matching users found : {user_exist}')
     if user_exist == 1:
         return True
     elif user_exist == 0:
@@ -63,5 +63,6 @@ def generate_hash(user_data, username):
     :rtype: bytes
     """
     salt = b'$2b$12$NmjU6/raMmtCvJMHgx6ht.'
+    # hard-coding is not safe
     password = bcrypt.hashpw(user_data[username].encode("utf-8"), salt)
     return password
