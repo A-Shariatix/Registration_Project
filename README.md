@@ -4,7 +4,6 @@
 In this Project, a basic registration system has been developed through a variety of technologies including:
 
 -Docker
-
 -HAProxy
 
 
