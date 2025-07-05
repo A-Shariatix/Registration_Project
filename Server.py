@@ -1,14 +1,16 @@
+# third-party imports
 import pymysql
 from dbutils import pooled_db
 from flask import Flask, request, g
+from prometheus_flask_exporter import PrometheusMetrics
+
+# local app imports
 import lang_en as lang
-import util
-import time
 from util import check_user_credentials, generate_hash, check_input_data
 
 
 app = Flask(__name__)
-
+metrics = PrometheusMetrics(app)
 
 app.pool = pooled_db.PooledDB(
         creator=pymysql,
@@ -57,13 +59,6 @@ def sign_up():
                 return lang.Signup_success, 200
             else:
                 return lang.Username_unavailable, 400
-
-        if check_user_credentials(username, password, cursor) is False:
-            cursor.execute('insert into information (username, password) values (%s, %s)', (username, password))
-            conn.commit()
-            return lang.Signup_success, 200
-        else:
-            return lang.Username_unavailable, 400
     return lang.User_Data_Input_Invalid, 400
 
 
@@ -88,11 +83,6 @@ def login():
                 return lang.Login_success, 200
             else:
                 return lang.User_Data_Input_Invalid, 400
-
-        if check_user_credentials(username, password, cursor) is True:
-            return lang.Login_success, 200
-        else:
-            return lang.User_Data_Input_Invalid, 400
     return lang.User_Data_Input_Invalid, 400
 
 
@@ -116,11 +106,6 @@ def forgotten_password():
                 cursor.execute('update information set password = %s where username = %s', (password, username))
                 g.conn.commit()
                 return lang.Update_password, 200
-
-        if check_user_credentials(username, password, cursor) is True:
-            cursor.execute('update information set password = %s where username = %s', (password, username))
-            conn.commit()
-            return lang.Update_password, 200
     return lang.User_Data_Input_Invalid, 400
 
 
