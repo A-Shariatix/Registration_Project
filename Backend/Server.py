@@ -2,15 +2,15 @@
 import pymysql
 from dbutils import pooled_db
 from flask import Flask, request, g
-from prometheus_flask_exporter import PrometheusMetrics
+import time
 
 # local app imports
 import lang_en as lang
 from util import check_user_credentials, generate_hash, check_input_data
+import exporter
 
 
 app = Flask(__name__)
-metrics = PrometheusMetrics(app)
 
 app.pool = pooled_db.PooledDB(
         creator=pymysql,
@@ -29,12 +29,60 @@ def setup_conn():
     g.conn = app.pool.connection()
 
 
+@app.before_request
+def start_timer():
+    g.start_time = time.time()
+
+
+@app.after_request
+def end_timer(response):
+    if hasattr(request, 'start_time'):
+        duration = time.time() - g.start_time
+        exporter.request_duration.labels(
+            status=str(response.status_code), path=request.path, method=request.method
+        ).observe(duration)
+        exporter.requests_duration_distribution.labels(
+            status=str(response.status_code), path=request.path, method=request.method
+        ).observe(duration)
+    return response
+
+
+@app.before_request
+def increase_active_request():
+    exporter.active_requests.labels(
+        path=request.path, method=request.method
+    ).inc()
+
+
+@app.after_request
+def decrease_active_request(response):
+    exporter.active_requests.labels(
+        path=request.path, method=request.method
+    ).dec()
+    return response
+
+
+@app.after_request
+def request_counter(response):
+    exporter.http_requests_total.labels(
+        status=str(response.status_code), path=request.path, method=request.method
+    ).inc()
+    return response
+
+
 @app.teardown_request
 def close_conn(exception):
-    if hasattr(g, "cursor"):
+    cursor = getattr(g, "cursor", "none")
+    conn = getattr(g, "conn", "none")
+    if cursor:
         g.cursor.close()
-    if hasattr(g, "conn"):
+    if conn:
         g.conn.close()
+
+
+@app.route('/metrics')
+def metrics():
+    return exporter.metrics()
 
 
 @app.route('/sign_up', methods=['POST'])
