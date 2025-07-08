@@ -14,10 +14,10 @@ services:
             - basic_registration
         healthcheck:
             test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ubatman", "-proot"]
-            interval: 10s
-            retries: 20
+            interval: 5s
+            retries: 12
         volumes:
-            - database-data:/var/lib/mysql
+            - database-storage:/var/lib/mysql
     database_migrator:
         container_name: db_migrator
         build:
@@ -27,29 +27,32 @@ services:
         depends_on:
             database:
                 condition: service_healthy
-   time_series_database:
-       container_name: prometheus
-       image: prom/prometheus:v3.2.1
-       volumes:
-           - "./monitoring/prometheus.yaml:/etc/prometheus/prometheus.yaml"
-       ports:
-           - "9090:9090"
-       networks:
-           - basic_registration
-#    exporter:
-#        container_name: node_exporter
-#        image: prom/node-exporter
-#        ports:
-#            - "9100:9100"
-#        networks:
-#            - basic_registration
-#    visualizer:
-#        container_name: grafana
-#        image: grafana/grafana:11.6.0
-#        ports:
-#            - "3000:3000"
-#        networks:
-#            - basic_registration
+#    database_exporter:
+#        container_name: mysql_exporter
+#        image: prom/mysqld_exporter
+    time_series_database:
+        container_name: prometheus
+        image: prom/prometheus:v3.2.1
+        ports:
+            - "9090:9090"
+        depends_on:
+            - load_balancer
+        networks:
+            - basic_registration
+        volumes:
+            - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+            - prometheus-storage:/prometheus
+    visualizer:
+        container_name: grafana
+        image: grafana/grafana:11.6.0
+        ports:
+            - "3000:3000"
+        depends_on:
+            - time_series_database
+        networks:
+            - basic_registration
+        volumes:
+            - grafana-storage:/var/lib/grafana
     load_balancer:
         container_name: haproxy
         image: haproxy:3.1.1
@@ -91,5 +94,6 @@ networks:
     basic_registration:
         driver: bridge
 volumes:
-    database-data:
-    visualizer-data:
+    database-storage:
+    grafana-storage:
+    prometheus-storage:
