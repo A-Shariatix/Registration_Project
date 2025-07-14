@@ -17,7 +17,7 @@ registry = CollectorRegistry()
 
 
 def metrics():
-    return generate_latest(registry=registry), 200
+    return generate_latest(registry=registry, ), 200, {'Content-Type': 'text/plain; version=0.0.4; charset=utf-8'}
 
 
 http_requests_total = Counter(
