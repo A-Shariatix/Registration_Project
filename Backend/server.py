@@ -72,11 +72,9 @@ def request_counter(response):
 
 @app.teardown_request
 def close_conn(exception):
-    cursor = getattr(g, "cursor", "none")
-    conn = getattr(g, "conn", "none")
-    if cursor:
-        g.cursor.close()
-    if conn:
+    if hasattr(g, "conn"):
+        g.conn.close()
+    if hasattr(g, "cursor"):
         g.conn.close()
 
 
