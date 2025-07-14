@@ -13,23 +13,34 @@ services:
         networks:
             - basic_registration
         healthcheck:
-            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ubatman", "-proot"]
-            interval: 5s
-            retries: 12
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+            interval: 6s
+            retries: 300
         volumes:
             - database-storage:/var/lib/mysql
-    database_migrator:
-        container_name: db_migrator
-        build:
-            context: db_migrator
+            - ./InitDB:/docker-entrypoint-initdb.d
+#    database_migrator:
+#        container_name: db_migrator
+#        build:
+#            context: db_migrator
+#        networks:
+#            - basic_registration
+#        depends_on:
+#            database:
+#                condition: service_healthy
+    database_exporter:
+        container_name: mysql_exporter
+        image: prom/mysqld-exporter:v0.15.1
+        ports:
+            - "9104:9104"
+        volumes:
+            - ./DB_Exporter_Config/.my.cnf:/etc/mysql_exporter/my.cnf:ro
+        command:
+            - --config.my-cnf=/etc/mysql_exporter/my.cnf
+        depends_on:
+            - time_series_database
         networks:
             - basic_registration
-        depends_on:
-            database:
-                condition: service_healthy
-#    database_exporter:
-#        container_name: mysql_exporter
-#        image: prom/mysqld_exporter
     time_series_database:
         container_name: prometheus
         image: prom/prometheus:v3.2.1
@@ -40,7 +51,7 @@ services:
         networks:
             - basic_registration
         volumes:
-            - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+            - ./Monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
             - prometheus-storage:/prometheus
     visualizer:
         container_name: grafana
@@ -57,7 +68,7 @@ services:
         container_name: haproxy
         image: haproxy:3.1.1
         volumes:
-            - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+            - ./Load_Balancer/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
         ports:
             - "8080:8080"
         depends_on:
@@ -68,28 +79,34 @@ services:
             - basic_registration
     backend_1:
         container_name: registration_backend_1
-        build: ./
+        build: ./Backend/
         networks:
             - basic_registration
         depends_on:
-            database_migrator:
-                condition: service_completed_successfully
+            database:
+                condition: service_healthy
+#            database_migrator:
+#                condition: service_completed_successfully
     backend_2:
         container_name: registration_backend_2
-        build: ./
+        build: ./Backend/
         networks:
             - basic_registration
         depends_on:
-            database_migrator:
-                condition: service_completed_successfully
+            database:
+                condition: service_healthy
+#            database_migrator:
+#                condition: service_completed_successfully
     backend_3:
         container_name: registration_backend_3
-        build: ./
+        build: ./Backend/
         networks:
             - basic_registration
         depends_on:
-            database_migrator:
-                condition: service_completed_successfully
+            database:
+                condition: service_healthy
+#            database_migrator:
+#                condition: service_completed_successfully
 networks:
     basic_registration:
         driver: bridge
